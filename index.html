@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Jay OS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#12232E">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Jay OS">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root{
+    --ink:#12232E;
+    --ink-2:#1B3646;
+    --parchment:#EFE7D8;
+    --brass:#B08D57;
+    --seaglass:#5FA8A0;
+    --flag:#E1673C;
+    --violet:#8E7FB8;
+    --line: rgba(239,231,216,0.14);
+    --line-strong: rgba(239,231,216,0.28);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: radial-gradient(circle at 15% -10%, #1E3B4C 0%, var(--ink) 55%);
+    color: var(--parchment);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+    padding: 28px 20px 60px;
+  }
+  .wrap{ max-width: 1120px; margin: 0 auto; }
+  h2{ font-family:'Fraunces', serif; font-weight:600; font-size:20px; margin:0 0 4px; }
+  .sub{ font-size:13px; color:#B9C6CC; margin:0 0 14px; }
+  .panel{
+    background: linear-gradient(180deg, rgba(239,231,216,0.06), rgba(239,231,216,0.02));
+    border:1px solid var(--line-strong); border-radius:10px;
+    padding: 18px 20px; margin-bottom: 22px;
+  }
+
+  /* Header */
+  header{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    flex-wrap:wrap; gap:16px;
+    border-bottom: 1px solid var(--line-strong);
+    padding-bottom: 18px; margin-bottom: 6px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.14em;
+    text-transform:uppercase; color: var(--brass); margin:0 0 6px;
+  }
+  h1{
+    font-family:'Fraunces', serif; font-weight:600; font-optical-sizing:auto;
+    font-size: clamp(28px, 4vw, 42px); margin:0; letter-spacing:-0.01em;
+  }
+  .clock{ text-align:right; font-family:'IBM Plex Mono', monospace; color: var(--seaglass); font-size:14px; line-height:1.5; }
+  .clock .time{ font-size:22px; color:var(--parchment); }
+  .horizon{ height:34px; margin: 18px 0 8px; opacity:0.7; }
+
+  /* Buttons / inputs shared */
+  button{ font-family:'IBM Plex Sans'; cursor:pointer; }
+  input, select, textarea{
+    font-family:'IBM Plex Sans'; background: rgba(18,35,46,0.6);
+    border:1px solid var(--line-strong); color: var(--parchment);
+    font-size:12.5px; padding:7px 8px; border-radius:5px; width:100%;
+  }
+  label.field-label{ font-family:'IBM Plex Mono'; font-size:10px; color:#8CA0A8; display:block; margin-bottom:4px; text-transform:uppercase; letter-spacing:0.05em; }
+  .btn{ border:none; font-weight:600; font-size:12.5px; padding:8px 14px; border-radius:5px; }
+  .btn:hover{ filter:brightness(1.08); }
+  .btn-brass{ background: var(--brass); color: var(--ink); }
+  .btn-flag{ background: var(--flag); color: var(--ink); }
+  .btn-seaglass{ background: var(--seaglass); color: var(--ink); }
+  .btn-violet{ background: var(--violet); color: var(--ink); }
+  .btn-ghost{ background: transparent; border:1px solid var(--line-strong); color: var(--parchment); }
+  .btn-ghost.active{ background: var(--seaglass); color:var(--ink); border-color:var(--seaglass); }
+
+
+  .focus-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;}
+  .focus-card{background:rgba(239,231,216,0.035);border:1px solid var(--line);border-radius:10px;padding:16px;}
+  .focus-card h3{font-family:'Fraunces',serif;font-size:16px;margin:0 0 10px;}
+  .quick-capture{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;}
+  .top3-list{display:flex;flex-direction:column;gap:8px;}
+  .top3-item{padding:9px 10px;border-radius:7px;background:rgba(95,168,160,0.08);border:1px solid rgba(95,168,160,0.22);font-size:13px;}
+  @media(max-width:760px){.focus-grid{grid-template-columns:1fr}.quick-capture{grid-template-columns:1fr 1fr}.quick-capture .wide{grid-column:1/-1}}
+
+  /* Today panel */
+  .today-list{ display:flex; flex-direction:column; gap:8px; }
+  .empty-today{ font-size:13px; color:#8CA0A8; font-style:italic; }
+  .notify-row{
+    display:flex; align-items:center; gap:10px; margin-top:14px; padding-top:14px;
+    border-top:1px dashed var(--line); font-size:12.5px; color:#B9C6CC; flex-wrap:wrap;
+  }
+
+  /* Money projection */
+  .money-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:14px; }
+  .money-card{ background: rgba(176,141,87,0.07); border:1px solid var(--line); border-radius:9px; padding:14px 16px; }
+  .money-label{ font-family:'IBM Plex Mono'; font-size:11px; text-transform:uppercase; letter-spacing:0.06em; color:#B9C6CC; margin-bottom:6px; }
+  .money-amt{ font-family:'Fraunces', serif; font-size:26px; font-weight:600; color: var(--parchment); }
+  .money-sub{ font-size:11px; color:#8CA0A8; margin-top:4px; }
+
+  /* Lanes / tasks */
+  .lanes{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+  .lane{ background: rgba(239,231,216,0.035); border:1px solid var(--line); border-radius:10px; padding:16px; display:flex; flex-direction:column; min-height:220px; }
+  .lane-head{ display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .lane-dot{ width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+  .lane-title{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; }
+  .lane-count{ margin-left:auto; font-family:'IBM Plex Mono'; font-size:11px; color:#8CA0A8; }
+
+  .task{ display:flex; align-items:flex-start; gap:9px; padding:9px 8px; border-radius:6px; margin-bottom:6px; border:1px solid transparent; transition: background 0.15s; }
+  .task:hover{ background: rgba(239,231,216,0.05); }
+  .task.overdue{ border-color: rgba(225,103,60,0.4); background: rgba(225,103,60,0.07); }
+  .task.done .task-text{ text-decoration: line-through; opacity:0.45; }
+  .task-check{ width:16px; height:16px; border-radius:4px; border:1.5px solid var(--brass); margin-top:2px; cursor:pointer; flex-shrink:0; display:flex; align-items:center; justify-content:center; background: transparent; }
+  .task.done .task-check{ background: var(--brass); }
+  .task-check svg{ display:none; width:10px; height:10px; }
+  .task.done .task-check svg{ display:block; }
+  .task-body{ flex:1; min-width:0; }
+  .task-text{ font-size:13.5px; line-height:1.4; word-break:break-word; }
+  .task-detail{ font-size:11.5px; color:#9FB2B8; margin-top:2px; font-style:italic; }
+  .task-meta{ font-family:'IBM Plex Mono'; font-size:10.5px; color:#8CA0A8; margin-top:2px; display:flex; gap:8px; flex-wrap:wrap; }
+  .flag-dot{ display:inline-block; width:6px; height:6px; border-radius:50%; margin-right:4px; }
+  .flag-high{ background: var(--flag); } .flag-med{ background: var(--brass); } .flag-low{ background: var(--seaglass); }
+  .task-del{ background:none; border:none; color:#6B7E85; cursor:pointer; font-size:15px; padding:2px 4px; flex-shrink:0; }
+  .task-del:hover{ color: var(--flag); }
+  .lane-empty, .bill-empty, .person-empty{ font-size:12px; color:#6B7E85; font-style:italic; padding:4px 0; }
+  .add-row{ margin-top:auto; padding-top:12px; border-top:1px dashed var(--line); display:flex; flex-direction:column; gap:6px; }
+  .add-row .row2{ display:flex; gap:6px; }
+  .add-row .row2 input, .add-row .row2 select{ flex:1; }
+
+  /* Bills */
+  .bill-grid{ display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .bill-row{ display:flex; align-items:center; gap:12px; padding:10px 12px; border-radius:7px; background: rgba(239,231,216,0.03); border:1px solid var(--line); flex-wrap:wrap; }
+  .bill-row.due-soon{ border-color: rgba(176,141,87,0.5); background: rgba(176,141,87,0.08); }
+  .bill-row.due-urgent{ border-color: rgba(225,103,60,0.5); background: rgba(225,103,60,0.09); }
+  .tag-pill{ font-family:'IBM Plex Mono'; font-size:10px; letter-spacing:0.06em; text-transform:uppercase; padding:3px 8px; border-radius:20px; flex-shrink:0; }
+  .bill-name{ font-size:13.5px; font-weight:500; flex:1; min-width:120px; }
+  .bill-amount{ font-family:'IBM Plex Mono'; font-size:12.5px; color:var(--brass); flex-shrink:0; }
+  .bill-due{ font-family:'IBM Plex Mono'; font-size:11.5px; color:#B9C6CC; flex-shrink:0; min-width:150px; text-align:right; }
+  .bill-due.urgent{ color: var(--flag); } .bill-due.soon{ color: var(--brass); }
+  .bill-del{ background:none; border:none; color:#6B7E85; cursor:pointer; font-size:15px; padding:2px 4px; flex-shrink:0; }
+  .bill-del:hover{ color: var(--flag); }
+  .bill-add, .event-add, .ledger-add{ display:grid; grid-template-columns: 2fr 1fr 1fr 1fr auto; gap:8px; padding-top:14px; border-top:1px dashed var(--line); align-items:end; }
+  @media (max-width: 760px){ .bill-add, .event-add, .ledger-add{ grid-template-columns: 1fr 1fr; } }
+
+  /* People / events / ledger */
+  .person-card{ border:1px solid var(--line); border-radius:9px; padding:14px 16px; margin-bottom:14px; background: rgba(142,127,184,0.05); }
+  .person-head{ display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+  .person-name{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; flex:1; }
+  .person-del{ background:none; border:none; color:#6B7E85; cursor:pointer; font-size:15px; }
+  .person-del:hover{ color: var(--flag); }
+  .subhead{ font-family:'IBM Plex Mono'; font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:#8CA0A8; margin:10px 0 6px; }
+  .event-row, .ledger-row{ display:flex; align-items:center; gap:10px; padding:7px 9px; border-radius:6px; background: rgba(239,231,216,0.03); margin-bottom:5px; flex-wrap:wrap; }
+  .event-occasion, .ledger-note{ font-size:13px; flex:1; min-width:100px; }
+  .event-due{ font-family:'IBM Plex Mono'; font-size:11px; color:#B9C6CC; }
+  .event-due.urgent{ color:var(--flag); } .event-due.soon{ color:var(--brass); }
+  .ledger-amt{ font-family:'IBM Plex Mono'; font-size:12px; }
+  .ledger-amt.given{ color: var(--flag); } .ledger-amt.received{ color: var(--seaglass); }
+  .row-del{ background:none; border:none; color:#6B7E85; cursor:pointer; font-size:14px; }
+  .row-del:hover{ color: var(--flag); }
+  .ledger-summary{ display:flex; gap:18px; margin-top:8px; font-family:'IBM Plex Mono'; font-size:12px; flex-wrap:wrap; }
+  .ledger-summary span b{ display:block; font-family:'Fraunces', serif; font-size:16px; font-weight:600; }
+  .add-person-row{ display:flex; gap:8px; margin-top:6px; }
+  .add-person-row input{ flex:1; }
+
+  /* Calendar */
+  .cal-header{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  .cal-nav{ display:flex; align-items:center; gap:8px; margin-left:auto; }
+  .cal-nav button{ background:transparent; border:1px solid var(--line-strong); color:var(--parchment); border-radius:5px; padding:5px 10px; font-size:13px; }
+  .cal-title{ font-family:'Fraunces', serif; font-size:16px; font-weight:600; min-width:150px; text-align:center; }
+  .view-switch{ display:flex; gap:6px; }
+  .view-switch button{ font-size:12px; padding:6px 12px; border-radius:5px; }
+  .biz-toggle{ font-size:12px; padding:6px 12px; border-radius:5px; }
+
+  .cal-month-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap:5px; }
+  .cal-dow{ font-family:'IBM Plex Mono'; font-size:10px; color:#8CA0A8; text-align:center; padding-bottom:4px; text-transform:uppercase; }
+  .cal-day{ min-height:64px; border:1px solid var(--line); border-radius:7px; padding:5px 6px; cursor:pointer; background: rgba(239,231,216,0.02); }
+  .cal-day:hover{ background: rgba(239,231,216,0.06); }
+  .cal-day.today{ border-color: var(--seaglass); }
+  .cal-day.selected{ background: rgba(95,168,160,0.12); border-color: var(--seaglass); }
+  .cal-day.other-month{ opacity:0.3; }
+  .cal-day-num{ font-family:'IBM Plex Mono'; font-size:11px; color:#B9C6CC; }
+  .cal-dots{ display:flex; gap:3px; margin-top:6px; flex-wrap:wrap; }
+  .cal-dot{ width:6px; height:6px; border-radius:50%; }
+
+  .cal-week-list{ display:flex; flex-direction:column; gap:8px; }
+  .cal-week-day{ border:1px solid var(--line); border-radius:8px; padding:10px 12px; }
+  .cal-week-day.today{ border-color: var(--seaglass); }
+  .cal-week-day-title{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--brass); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em; }
+
+  .cal-year-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:16px; }
+  .mini-month{ border:1px solid var(--line); border-radius:8px; padding:10px; }
+  .mini-month-title{ font-family:'Fraunces', serif; font-size:13px; font-weight:600; margin-bottom:6px; text-align:center; }
+  .mini-grid{ display:grid; grid-template-columns: repeat(7, 1fr); gap:2px; }
+  .mini-day{ aspect-ratio:1; font-size:9px; display:flex; align-items:center; justify-content:center; border-radius:3px; color:#8CA0A8; cursor:pointer; }
+  .mini-day.has-items{ background: rgba(95,168,160,0.25); color: var(--parchment); }
+  .mini-day.today{ border:1px solid var(--seaglass); }
+  .mini-day.other-month{ visibility:hidden; }
+
+  .agenda-panel{ margin-top:16px; padding-top:14px; border-top:1px dashed var(--line); }
+  .agenda-title{ font-family:'Fraunces', serif; font-size:15px; font-weight:600; margin-bottom:8px; }
+  .agenda-item{ display:flex; align-items:center; gap:10px; padding:7px 9px; border-radius:6px; background: rgba(239,231,216,0.03); margin-bottom:5px; font-size:13px; }
+  .agenda-empty{ font-size:12.5px; color:#6B7E85; font-style:italic; }
+
+  footer{ margin-top:36px; padding-top:16px; border-top:1px solid var(--line); font-size:11.5px; color:#6B7E85; line-height:1.6; }
+  .toast{ position:fixed; bottom:20px; right:20px; background: var(--ink-2); border:1px solid var(--seaglass); color:var(--parchment); padding:10px 16px; border-radius:8px; font-size:13px; opacity:0; transform:translateY(8px); transition: all 0.25s; pointer-events:none; z-index:50; }
+  .toast.show{ opacity:1; transform:translateY(0); }
+
+  /* Lock screen */
+  #lockScreen{
+    position:fixed; inset:0; background: radial-gradient(circle at 15% -10%, #1E3B4C 0%, var(--ink) 60%);
+    display:flex; align-items:center; justify-content:center; z-index:100; padding:20px;
+  }
+  .lock-card{ max-width:340px; width:100%; text-align:center; }
+  .lock-card .eyebrow{ text-align:center; }
+  .lock-card h1{ font-size:26px; margin-bottom:18px; }
+  .lock-card p{ font-size:12.5px; color:#B9C6CC; margin:0 0 18px; line-height:1.6; }
+  .lock-card input{ text-align:center; letter-spacing:0.1em; margin-bottom:10px; }
+  .lock-card .btn{ width:100%; padding:10px; margin-top:4px; }
+  .lock-error{ font-size:12px; color: var(--flag); min-height:16px; margin-top:8px; }
+  .lock-reset{ background:none; border:none; color:#6B7E85; font-size:11.5px; margin-top:16px; text-decoration:underline; cursor:pointer; }
+  .lock-reset:hover{ color: var(--parchment); }
+  .wrap{ display:none; }
+  .wrap.unlocked{ display:block; }
+</style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-card" id="lockCard"></div>
+</div>
+
+<div class="wrap" id="mainWrap">
+
+
+  <header>
+    <div>
+      <p class="eyebrow" id="greeting">Daily overview</p>
+      <h1>Jay OS</h1>
+    </div>
+    <div class="clock">
+      <div id="dateStr"></div>
+      <div class="time" id="timeStr"></div>
+    </div>
+  </header>
+
+  <svg class="horizon" viewBox="0 0 1000 40" preserveAspectRatio="none">
+    <path d="M0 20 Q 50 5, 100 20 T 200 20 T 300 20 T 400 20 T 500 20 T 600 20 T 700 20 T 800 20 T 900 20 T 1000 20" fill="none" stroke="#5FA8A0" stroke-width="1.2" opacity="0.5"/>
+  </svg>
+
+  <!-- DAILY FOCUS -->
+  <div class="panel">
+    <h2>Daily Focus</h2>
+    <p class="sub">Capture what matters, then work from your top priorities.</p>
+    <div class="focus-grid">
+      <div class="focus-card">
+        <h3>Top 3 Priorities</h3>
+        <div class="top3-list" id="top3List"></div>
+      </div>
+      <div class="focus-card">
+        <h3>Quick Add</h3>
+        <div class="quick-capture">
+          <div class="wide"><label class="field-label">Task, meeting or reminder</label><input id="quickText" placeholder="e.g. Meet Paul tomorrow at 10am" /></div>
+          <div><label class="field-label">Area</label><select id="quickLane"><option value="personal">Personal</option><option value="mortgage">Home One Mortgages</option><option value="film">GoldLeaf Studios</option><option value="nbia">NBIA</option><option value="property">Property & Finance</option></select></div>
+          <div><label class="field-label">Date and time</label><input type="datetime-local" id="quickDue" /></div>
+          <button class="btn btn-seaglass" id="quickAddBtn">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MONEY PROJECTION -->
+  <div class="panel">
+    <h2>Upcoming Money</h2>
+    <p class="sub">Bills and recurring payments coming up.</p>
+    <div class="money-grid" id="moneyGrid"></div>
+  </div>
+
+  <!-- BILLS -->
+  <div class="panel">
+    <h2>Bills &amp; Recurring Payments</h2>
+    <p class="sub">Rent, card payment due dates, rego, insurance — set once, it rolls forward on its own.</p>
+    <div class="bill-grid" id="billGrid"></div>
+    <div class="bill-add">
+      <div><label class="field-label">Name</label><input type="text" id="billName" placeholder="e.g. Rent, Car Rego, Visa card" /></div>
+      <div><label class="field-label">Amount</label><input type="text" id="billAmount" placeholder="$" /></div>
+      <div><label class="field-label">Category</label>
+        <select id="billCategory">
+          <option value="rent">Rent</option><option value="card">Credit card</option><option value="rego">Car rego</option>
+          <option value="utility">Utility</option><option value="insurance">Insurance</option><option value="other">Other</option>
+        </select>
+      </div>
+      <div><label class="field-label">Repeats</label>
+        <select id="billRecur"><option value="0">One-off</option><option value="1" selected>Monthly</option><option value="3">Quarterly</option><option value="12">Yearly</option></select>
+      </div>
+      <div><label class="field-label">Next due date</label><input type="date" id="billDate" /></div>
+      <button class="btn btn-flag" id="billAddBtn" style="grid-column:1 / -1;">Add bill / date</button>
+    </div>
+  </div>
+
+  <!-- TODAY -->
+  <div class="panel">
+    <h2>Today</h2>
+    <p class="sub" id="todaySub">Due today and overdue, across every lane.</p>
+    <div class="today-list" id="todayList"></div>
+    <div class="notify-row">
+      <button class="btn btn-seaglass" id="notifyBtn">Enable on-screen reminders</button>
+      <span id="notifyStatus">Fires a popup here when something's due — only while this tab is open.</span>
+    </div>
+  </div>
+
+  <!-- LANES -->
+  <div class="lanes" id="lanes"></div>
+
+  <!-- PEOPLE / EVENTS / LEDGER -->
+  <div class="panel" style="margin-top:22px;">
+    <h2>People &amp; Important Dates</h2>
+    <p class="sub">Birthdays, anniversaries, celebrations and gift records.</p>
+    <div id="peopleList"></div>
+    <div class="add-person-row">
+      <input type="text" id="newPersonName" placeholder="Add a friend or family (e.g. Rohan &amp; Simran)" />
+      <button class="btn btn-violet" id="addPersonBtn">Add</button>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="panel">
+    <div class="cal-header">
+      <h2 style="margin:0;">Calendar</h2>
+      <button class="btn btn-ghost biz-toggle" id="bizToggle">Personal view</button>
+      <div class="cal-nav">
+        <div class="view-switch">
+          <button class="btn btn-ghost active" data-view="month">Month</button>
+          <button class="btn btn-ghost" data-view="week">Week</button>
+          <button class="btn btn-ghost" data-view="year">Year</button>
+        </div>
+        <button id="calPrev">‹</button>
+        <span class="cal-title" id="calTitle"></span>
+        <button id="calNext">›</button>
+      </div>
+    </div>
+    <div id="calBody"></div>
+    <div class="agenda-panel" id="agendaPanel" style="display:none;">
+      <div class="agenda-title" id="agendaTitle"></div>
+      <div id="agendaList"></div>
+    </div>
+  </div>
+
+  <footer>
+    Your information saves automatically on this device. Browser reminders work only while this page is open. Keep important appointments in your phone calendar as a backup.
+  </footer>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Local browser storage fallback so Jay OS works as a normal downloaded HTML file.
+if(!window.storage){
+  window.storage={
+    async get(key){const value=localStorage.getItem(key);return value===null?null:{value};},
+    async set(key,value){localStorage.setItem(key,value);return true;},
+    async delete(key){localStorage.removeItem(key);return true;}
+  };
+}
+const LANES = [
+  { id:'mortgage', label:'Home One Mortgages', color:'#5FA8A0' },
+  { id:'film', label:'GoldLeaf Studios', color:'#B08D57' },
+  { id:'nbia', label:'NBIA', color:'#E1673C' },
+  { id:'property', label:'Property & Finance', color:'#7C9EB2' },
+  { id:'personal', label:'Personal', color:'#C9B896' },
+];
+const CATEGORIES = {
+  rent:{label:'Rent',color:'#5FA8A0'}, card:{label:'Credit card',color:'#B08D57'}, rego:{label:'Car rego',color:'#E1673C'},
+  utility:{label:'Utility',color:'#7C9EB2'}, insurance:{label:'Insurance',color:'#C9B896'}, other:{label:'Other',color:'#8CA0A8'}
+};
+const EVENT_TYPES = {
+  birthday:{label:'Birthday', color:'#E1673C', interval:12}, wedding:{label:'Wedding', color:'#8E7FB8', interval:0},
+  anniversary:{label:'Anniversary', color:'#B08D57', interval:12}, other:{label:'Other', color:'#5FA8A0', interval:0}
+};
+
+let state = { tasks: [], bills: [], people: [] };
+let notifyEnabled = false;
+let businessMode = false;
+let calView = 'month';
+let calDate = new Date(); // month/year currently displayed
+let selectedDate = new Date(); selectedDate.setHours(0,0,0,0);
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+async function load(){
+  try{
+    const res = await window.storage.get('daily-deck-data');
+    if(res && res.value){ state = JSON.parse(res.value); }
+  }catch(e){ /* first run */ }
+  if(!state.tasks) state.tasks = [];
+  if(!state.bills) state.bills = [];
+  if(!state.people) state.people = [];
+  renderAll();
+}
+async function save(){
+  try{ await window.storage.set('daily-deck-data', JSON.stringify(state)); }
+  catch(e){ console.error('save failed', e); }
+}
+
+/* ---------- date helpers ---------- */
+function addMonths(date, n){ return new Date(date.getFullYear(), date.getMonth()+n, date.getDate()); }
+function startOfDay(d){ const x=new Date(d); x.setHours(0,0,0,0); return x; }
+function daysUntil(date){ const t=startOfDay(new Date()); const d=startOfDay(date); return Math.round((d-t)/86400000); }
+function sameDate(a,b){ return startOfDay(a).getTime() === startOfDay(b).getTime(); }
+
+// next occurrence on/after 'from' for a recurring anchor+interval (months); interval 0 = one-off
+function nextOccurrence(anchorStr, interval, from){
+  const anchor = new Date(anchorStr + 'T00:00:00');
+  const start = startOfDay(from);
+  if(interval === 0) return anchor;
+  let d = new Date(anchor);
+  while(d < start){ d = addMonths(d, interval); }
+  return d;
+}
+// all occurrences within [start,end] inclusive
+function occurrencesInRange(anchorStr, interval, start, end){
+  const anchor = new Date(anchorStr + 'T00:00:00');
+  const out = [];
+  if(interval === 0){
+    if(anchor >= start && anchor <= end) out.push(anchor);
+    return out;
+  }
+  let d = new Date(anchor);
+  while(d < start){ d = addMonths(d, interval); }
+  while(d <= end){ out.push(new Date(d)); d = addMonths(d, interval); }
+  return out;
+}
+function fmtDate(date, opts){
+  return date.toLocaleDateString('en-AU', opts || {weekday:'short', day:'numeric', month:'short'});
+}
+function countdownText(days){
+  if(days < 0) return 'passed';
+  if(days === 0) return 'today';
+  if(days === 1) return 'tomorrow';
+  return `in ${days} days`;
+}
+
+/* ---------- MONEY PROJECTION ---------- */
+function renderMoney(){
+  const today = startOfDay(new Date());
+  const endToday = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23,59,59);
+  const end2wk = new Date(today); end2wk.setDate(end2wk.getDate()+14); end2wk.setHours(23,59,59);
+  const endMonth = new Date(today.getFullYear(), today.getMonth()+1, 0, 23,59,59);
+  const endYear = new Date(today.getFullYear(), 11, 31, 23,59,59);
+
+  function sumFor(end){
+    let total=0, count=0;
+    state.bills.forEach(b=>{
+      const amt = parseFloat(b.amount);
+      if(isNaN(amt)) return;
+      const occ = occurrencesInRange(b.anchor, b.interval, today, end);
+      total += amt * occ.length; count += occ.length;
+    });
+    return {total, count};
+  }
+  const windows = [
+    {label:'Today', ...sumFor(endToday)},
+    {label:'Next 2 Weeks', ...sumFor(end2wk)},
+    {label:'This Month', ...sumFor(endMonth)},
+    {label:'This Year', ...sumFor(endYear)},
+  ];
+  document.getElementById('moneyGrid').innerHTML = windows.map(w => `
+    <div class="money-card">
+      <div class="money-label">${w.label}</div>
+      <div class="money-amt">$${w.total.toLocaleString('en-AU', {minimumFractionDigits:0, maximumFractionDigits:2})}</div>
+      <div class="money-sub">${w.count} bill${w.count!==1?'s':''} due</div>
+    </div>`).join('');
+}
+
+/* ---------- TASKS / LANES ---------- */
+function isOverdue(t){ return t.due && !t.done && new Date(t.due) < new Date(); }
+function isToday(t){ if(!t.due) return false; return sameDate(new Date(t.due), new Date()); }
+
+function taskRow(t){
+  const overdue = isOverdue(t);
+  const flagClass = t.priority === 'high' ? 'flag-high' : t.priority === 'low' ? 'flag-low' : 'flag-med';
+  const showDetail = businessMode && t.detail;
+  return `
+    <div class="task ${overdue?'overdue':''} ${t.done?'done':''}" data-id="${t.id}">
+      <div class="task-check" data-action="toggle"><svg viewBox="0 0 12 12"><path d="M2 6l3 3 5-6" stroke="#12232E" stroke-width="1.6" fill="none"/></svg></div>
+      <div class="task-body">
+        <div class="task-text">${escapeHtml(t.text)}</div>
+        ${showDetail ? `<div class="task-detail">${escapeHtml(t.detail)}</div>` : ''}
+        <div class="task-meta">
+          <span><span class="flag-dot ${flagClass}"></span>${t.priority || 'medium'}</span>
+          ${t.due ? `<span>${overdue?'overdue — ':''}${new Date(t.due).toLocaleString('en-AU',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})}</span>` : ''}
+        </div>
+      </div>
+      <button class="task-del" data-action="delete" title="Remove">×</button>
+    </div>`;
+}
+
+function renderLanesAndToday(){
+  const hr = new Date().getHours();
+  document.getElementById('greeting').textContent = hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+  document.getElementById('dateStr').textContent = new Date().toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'long'});
+
+  const sortedBills = [...state.bills].sort((a,b)=> nextOccurrence(a.anchor,a.interval,new Date()) - nextOccurrence(b.anchor,b.interval,new Date()));
+  document.getElementById('billGrid').innerHTML = sortedBills.length ? sortedBills.map(billRow).join('') : `<div class="bill-empty">No bills or recurring dates added yet.</div>`;
+
+  const todays = state.tasks.filter(t => !t.done && (isToday(t) || isOverdue(t))).sort((a,b)=> (a.due?new Date(a.due):Infinity) - (b.due?new Date(b.due):Infinity));
+  const urgentBills = sortedBills.filter(b => daysUntil(nextOccurrence(b.anchor,b.interval,new Date())) <= 3);
+  const todayList = document.getElementById('todayList');
+  const combined = todays.map(taskRow).join('') + urgentBills.map(billRow).join('');
+  todayList.innerHTML = combined || `<div class="empty-today">Nothing due today. Clear watch.</div>`;
+  document.getElementById('todaySub').textContent = `${todays.length + urgentBills.length} item${(todays.length+urgentBills.length)!==1?'s':''} due today, overdue, or coming up within 3 days.`;
+
+  document.getElementById('lanes').innerHTML = LANES.map(lane => {
+    const items = state.tasks.filter(t => t.lane === lane.id).sort((a,b)=>{
+      if(a.done !== b.done) return a.done ? 1 : -1;
+      return (a.due?new Date(a.due):Infinity) - (b.due?new Date(b.due):Infinity);
+    });
+    const open = items.filter(t=>!t.done).length;
+    return `
+      <div class="lane" data-lane="${lane.id}">
+        <div class="lane-head"><span class="lane-dot" style="background:${lane.color}"></span><span class="lane-title">${lane.label}</span><span class="lane-count">${open} open</span></div>
+        <div class="lane-tasks">${items.length ? items.map(taskRow).join('') : '<div class="lane-empty">No tasks yet.</div>'}</div>
+        <div class="add-row">
+          <input type="text" placeholder="Add a task…" class="new-text" />
+          <input type="text" placeholder="Detail (only visible in Business view)" class="new-detail" />
+          <div class="row2">
+            <input type="datetime-local" class="new-due" />
+            <select class="new-priority"><option value="medium" selected>Med</option><option value="high">High</option><option value="low">Low</option></select>
+          </div>
+          <button class="btn btn-brass add-btn" data-action="add">Add to ${lane.label}</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  attachTaskBillHandlers();
+  renderMoney();
+}
+
+function billRow(b){
+  const due = nextOccurrence(b.anchor, b.interval, new Date());
+  const days = daysUntil(due);
+  const urgency = days<0 ? '' : days<=2 ? 'due-urgent' : days<=7 ? 'due-soon' : '';
+  const dueClass = days<0 ? '' : days<=2 ? 'urgent' : days<=7 ? 'soon' : '';
+  const cat = CATEGORIES[b.category] || CATEGORIES.other;
+  const recurLabel = b.interval===0?'one-off':b.interval===1?'monthly':b.interval===3?'quarterly':'yearly';
+  return `
+    <div class="bill-row ${urgency}" data-id="${b.id}">
+      <span class="tag-pill" style="background:${cat.color}33; color:${cat.color}">${cat.label}</span>
+      <span class="bill-name">${escapeHtml(b.name)}</span>
+      ${b.amount ? `<span class="bill-amount">$${escapeHtml(b.amount)}</span>` : ''}
+      <span class="bill-due ${dueClass}">${fmtDate(due)} · ${countdownText(days)} · ${recurLabel}</span>
+      <button class="bill-del" data-bill-action="delete" title="Remove">×</button>
+    </div>`;
+}
+
+function attachTaskBillHandlers(){
+  document.querySelectorAll('[data-action="toggle"]').forEach(el=>{
+    el.onclick = () => { const id = el.closest('.task').dataset.id; const t = state.tasks.find(x=>x.id===id); t.done=!t.done; save(); renderAll(); };
+  });
+  document.querySelectorAll('[data-action="delete"]').forEach(el=>{
+    el.onclick = () => { const id = el.closest('.task').dataset.id; state.tasks = state.tasks.filter(x=>x.id!==id); save(); renderAll(); };
+  });
+  document.querySelectorAll('[data-action="add"]').forEach(el=>{
+    el.onclick = () => {
+      const laneEl = el.closest('.lane'); const laneId = laneEl.dataset.lane;
+      const text = laneEl.querySelector('.new-text').value.trim();
+      const detail = laneEl.querySelector('.new-detail').value.trim();
+      const due = laneEl.querySelector('.new-due').value;
+      const priority = laneEl.querySelector('.new-priority').value;
+      if(!text) return;
+      state.tasks.push({ id:uid(), lane:laneId, text, detail, due: due ? new Date(due).toISOString() : null, priority, done:false, notified:false });
+      save(); renderAll();
+    };
+  });
+  document.querySelectorAll('[data-bill-action="delete"]').forEach(el=>{
+    el.onclick = () => { const id = el.closest('.bill-row').dataset.id; state.bills = state.bills.filter(x=>x.id!==id); save(); renderAll(); };
+  });
+}
+
+document.getElementById('billAddBtn').onclick = () => {
+  const name = document.getElementById('billName').value.trim();
+  const amount = document.getElementById('billAmount').value.trim();
+  const category = document.getElementById('billCategory').value;
+  const interval = parseInt(document.getElementById('billRecur').value, 10);
+  const dateVal = document.getElementById('billDate').value;
+  if(!name || !dateVal){ showToast('Add a name and a date first.'); return; }
+  state.bills.push({ id:uid(), name, amount, category, interval, anchor:dateVal, lastNotifiedDue:null });
+  document.getElementById('billName').value=''; document.getElementById('billAmount').value=''; document.getElementById('billDate').value='';
+  save(); renderAll();
+};
+
+/* ---------- PEOPLE / EVENTS / LEDGER ---------- */
+function personEventRow(person, ev){
+  const type = EVENT_TYPES[ev.type] || EVENT_TYPES.other;
+  const due = nextOccurrence(ev.date, ev.interval, new Date());
+  const days = daysUntil(due);
+  const dueClass = days<0?'':days<=3?'urgent':days<=14?'soon':'';
+  return `
+    <div class="event-row" data-person="${person.id}" data-id="${ev.id}">
+      <span class="tag-pill" style="background:${type.color}33; color:${type.color}">${type.label}</span>
+      <span class="event-occasion">${escapeHtml(ev.occasion)}</span>
+      <span class="event-due ${dueClass}">${fmtDate(due)} · ${countdownText(days)}</span>
+      <button class="row-del" data-event-action="delete" title="Remove">×</button>
+    </div>`;
+}
+function ledgerRow(person, entry){
+  const cls = entry.direction === 'given' ? 'given' : 'received';
+  const sign = entry.direction === 'given' ? '−' : '+';
+  return `
+    <div class="ledger-row" data-person="${person.id}" data-id="${entry.id}">
+      <span class="event-due">${fmtDate(new Date(entry.date+'T00:00:00'), {day:'numeric',month:'short',year:'numeric'})}</span>
+      <span class="ledger-note">${escapeHtml(entry.note || (entry.direction==='given'?'Given':'Received'))}</span>
+      <span class="ledger-amt ${cls}">${sign}$${escapeHtml(entry.amount)}</span>
+      <button class="row-del" data-ledger-action="delete" title="Remove">×</button>
+    </div>`;
+}
+
+function renderPeople(){
+  const list = document.getElementById('peopleList');
+  if(!state.people.length){ list.innerHTML = `<div class="person-empty">No friends or family added yet — add one below.</div>`; return; }
+  list.innerHTML = state.people.map(p => {
+    const events = [...p.events].sort((a,b)=> nextOccurrence(a.date,a.interval,new Date()) - nextOccurrence(b.date,b.interval,new Date()));
+    const ledger = [...p.ledger].sort((a,b)=> new Date(b.date) - new Date(a.date));
+    const totalGiven = ledger.filter(l=>l.direction==='given').reduce((s,l)=>s+(parseFloat(l.amount)||0),0);
+    const totalReceived = ledger.filter(l=>l.direction==='received').reduce((s,l)=>s+(parseFloat(l.amount)||0),0);
+    const net = totalReceived - totalGiven;
+    return `
+      <div class="person-card" data-person="${p.id}">
+        <div class="person-head"><span class="person-name">${escapeHtml(p.name)}</span><button class="person-del" data-person-action="delete-person">Remove</button></div>
+
+        <div class="subhead">Occasions</div>
+        ${events.length ? events.map(e=>personEventRow(p,e)).join('') : '<div class="person-empty">No dates yet.</div>'}
+        <div class="event-add">
+          <div><label class="field-label">Occasion</label><input type="text" class="ev-occasion" placeholder="e.g. Priya's Birthday" /></div>
+          <div><label class="field-label">Type</label><select class="ev-type"><option value="birthday">Birthday</option><option value="wedding">Wedding</option><option value="anniversary">Anniversary</option><option value="other">Other</option></select></div>
+          <div><label class="field-label">Repeats</label><select class="ev-interval"><option value="12" selected>Yearly</option><option value="0">One-off</option></select></div>
+          <div><label class="field-label">Date</label><input type="date" class="ev-date" /></div>
+          <button class="btn btn-violet" data-person-action="add-event">Add</button>
+        </div>
+
+        <div class="subhead" style="margin-top:14px;">Gift &amp; celebration ledger</div>
+        ${ledger.length ? ledger.map(l=>ledgerRow(p,l)).join('') : '<div class="person-empty">No entries yet.</div>'}
+        <div class="ledger-summary">
+          <span>Given by you<b>$${totalGiven.toLocaleString('en-AU')}</b></span>
+          <span>Given by them<b>$${totalReceived.toLocaleString('en-AU')}</b></span>
+          <span>Net<b style="color:${net>=0?'#5FA8A0':'#E1673C'}">${net>=0?'+':''}$${net.toLocaleString('en-AU')}</b></span>
+        </div>
+        <div class="ledger-add">
+          <div><label class="field-label">Note</label><input type="text" class="lg-note" placeholder="e.g. wedding gift" /></div>
+          <div><label class="field-label">Direction</label><select class="lg-direction"><option value="given">You gave</option><option value="received">They gave</option></select></div>
+          <div><label class="field-label">Amount</label><input type="text" class="lg-amount" placeholder="$" /></div>
+          <div><label class="field-label">Date</label><input type="date" class="lg-date" /></div>
+          <button class="btn btn-seaglass" data-person-action="add-ledger">Add</button>
+        </div>
+      </div>`;
+  }).join('');
+  attachPeopleHandlers();
+}
+
+function attachPeopleHandlers(){
+  document.querySelectorAll('[data-person-action="delete-person"]').forEach(el=>{
+    el.onclick = () => { const id = el.closest('.person-card').dataset.person; state.people = state.people.filter(p=>p.id!==id); save(); renderPeople(); renderCalendar(); };
+  });
+  document.querySelectorAll('[data-event-action="delete"]').forEach(el=>{
+    el.onclick = () => {
+      const row = el.closest('.event-row'); const personId = row.dataset.person, id = row.dataset.id;
+      const p = state.people.find(x=>x.id===personId); p.events = p.events.filter(e=>e.id!==id);
+      save(); renderPeople(); renderCalendar();
+    };
+  });
+  document.querySelectorAll('[data-ledger-action="delete"]').forEach(el=>{
+    el.onclick = () => {
+      const row = el.closest('.ledger-row'); const personId = row.dataset.person, id = row.dataset.id;
+      const p = state.people.find(x=>x.id===personId); p.ledger = p.ledger.filter(l=>l.id!==id);
+      save(); renderPeople();
+    };
+  });
+  document.querySelectorAll('[data-person-action="add-event"]').forEach(el=>{
+    el.onclick = () => {
+      const card = el.closest('.person-card'); const p = state.people.find(x=>x.id===card.dataset.person);
+      const occasion = card.querySelector('.ev-occasion').value.trim();
+      const type = card.querySelector('.ev-type').value;
+      const interval = parseInt(card.querySelector('.ev-interval').value,10);
+      const date = card.querySelector('.ev-date').value;
+      if(!occasion || !date){ showToast('Add an occasion and a date first.'); return; }
+      p.events.push({ id:uid(), occasion, type, interval, date });
+      save(); renderPeople(); renderCalendar();
+    };
+  });
+  document.querySelectorAll('[data-person-action="add-ledger"]').forEach(el=>{
+    el.onclick = () => {
+      const card = el.closest('.person-card'); const p = state.people.find(x=>x.id===card.dataset.person);
+      const note = card.querySelector('.lg-note').value.trim();
+      const direction = card.querySelector('.lg-direction').value;
+      const amount = card.querySelector('.lg-amount').value.trim();
+      const date = card.querySelector('.lg-date').value || new Date().toISOString().slice(0,10);
+      if(!amount){ showToast('Add an amount first.'); return; }
+      p.ledger.push({ id:uid(), note, direction, amount, date });
+      save(); renderPeople();
+    };
+  });
+}
+
+document.getElementById('addPersonBtn').onclick = () => {
+  const input = document.getElementById('newPersonName');
+  const name = input.value.trim();
+  if(!name) return;
+  state.people.push({ id:uid(), name, events:[], ledger:[] });
+  input.value='';
+  save(); renderPeople(); renderCalendar();
+};
+
+/* ---------- CALENDAR ---------- */
+function getItemsForDate(date){
+  const tasks = state.tasks.filter(t => t.due && sameDate(new Date(t.due), date));
+  const dayEnd = new Date(date.getFullYear(),date.getMonth(),date.getDate(),23,59,59);
+  const bills = state.bills.filter(b => occurrencesInRange(b.anchor, b.interval, startOfDay(date), dayEnd).length > 0);
+  const events = [];
+  state.people.forEach(p => p.events.forEach(e => {
+    const occ = occurrencesInRange(e.date, e.interval, startOfDay(date), new Date(date.getFullYear(),date.getMonth(),date.getDate(),23,59,59));
+    if(occ.length) events.push({ person:p.name, ...e });
+  }));
+  return { tasks, bills, events };
+}
+function hasItems(date){
+  const i = getItemsForDate(date);
+  return i.tasks.length || i.bills.length || i.events.length;
+}
+
+function setCalTitle(text){ document.getElementById('calTitle').textContent = text; }
+
+function renderCalendar(){
+  const body = document.getElementById('calBody');
+  if(calView === 'month') renderMonthView(body);
+  else if(calView === 'week') renderWeekView(body);
+  else renderYearView(body);
+  renderAgenda();
+}
+
+function renderMonthView(body){
+  const year = calDate.getFullYear(), month = calDate.getMonth();
+  setCalTitle(calDate.toLocaleDateString('en-AU',{month:'long', year:'numeric'}));
+  const firstDay = new Date(year, month, 1);
+  const startOffset = (firstDay.getDay()+6)%7; // Monday start
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const dows = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  let cells = '';
+  for(let i=0;i<startOffset;i++){
+    const d = new Date(year, month, 1-(startOffset-i));
+    cells += dayCellHtml(d, true);
+  }
+  for(let d=1; d<=daysInMonth; d++){ cells += dayCellHtml(new Date(year,month,d), false); }
+  const totalCells = startOffset + daysInMonth;
+  const trailing = (7 - (totalCells % 7)) % 7;
+  for(let i=1;i<=trailing;i++){ cells += dayCellHtml(new Date(year,month+1,i), true); }
+  body.innerHTML = `<div class="cal-month-grid">${dows.map(d=>`<div class="cal-dow">${d}</div>`).join('')}${cells}</div>`;
+  attachCalHandlers();
+}
+function dayCellHtml(date, otherMonth){
+  const items = getItemsForDate(date);
+  const dots = [];
+  if(items.tasks.length) dots.push('#5FA8A0');
+  if(items.bills.length) dots.push('#B08D57');
+  if(items.events.length) dots.push('#E1673C');
+  const isToday = sameDate(date, new Date());
+  const isSelected = sameDate(date, selectedDate);
+  return `
+    <div class="cal-day ${isToday?'today':''} ${isSelected?'selected':''} ${otherMonth?'other-month':''}" data-date="${date.toISOString().slice(0,10)}">
+      <div class="cal-day-num">${date.getDate()}</div>
+      <div class="cal-dots">${dots.map(c=>`<span class="cal-dot" style="background:${c}"></span>`).join('')}</div>
+    </div>`;
+}
+function renderWeekView(body){
+  const d = new Date(selectedDate);
+  const offset = (d.getDay()+6)%7;
+  const monday = new Date(d); monday.setDate(d.getDate()-offset);
+  setCalTitle(`${fmtDate(monday,{day:'numeric',month:'short'})} – ${fmtDate(addDays(monday,6),{day:'numeric',month:'short'})}`);
+  let html = '<div class="cal-week-list">';
+  for(let i=0;i<7;i++){
+    const day = addDays(monday, i);
+    const items = getItemsForDate(day);
+    const count = items.tasks.length+items.bills.length+items.events.length;
+    html += `<div class="cal-week-day ${sameDate(day,new Date())?'today':''}" data-date="${day.toISOString().slice(0,10)}">
+      <div class="cal-week-day-title">${day.toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'short'})} — ${count} item${count!==1?'s':''}</div>
+      ${agendaItemsHtml(items) || '<div class="agenda-empty">Nothing planned.</div>'}
+    </div>`;
+  }
+  html += '</div>';
+  body.innerHTML = html;
+  attachCalHandlers();
+}
+function addDays(date,n){ const d=new Date(date); d.setDate(d.getDate()+n); return d; }
+
+function renderYearView(body){
+  const year = calDate.getFullYear();
+  setCalTitle(String(year));
+  let html = '<div class="cal-year-grid">';
+  for(let m=0;m<12;m++){
+    const first = new Date(year,m,1);
+    const startOffset = (first.getDay()+6)%7;
+    const daysInMonth = new Date(year,m+1,0).getDate();
+    html += `<div class="mini-month"><div class="mini-month-title">${first.toLocaleDateString('en-AU',{month:'long'})}</div><div class="mini-grid">`;
+    for(let i=0;i<startOffset;i++){ html += `<div class="mini-day other-month"></div>`; }
+    for(let d=1; d<=daysInMonth; d++){
+      const date = new Date(year,m,d);
+      html += `<div class="mini-day ${hasItems(date)?'has-items':''} ${sameDate(date,new Date())?'today':''}" data-date="${date.toISOString().slice(0,10)}">${d}</div>`;
+    }
+    html += `</div></div>`;
+  }
+  html += '</div>';
+  body.innerHTML = html;
+  attachCalHandlers();
+}
+
+function agendaItemsHtml(items){
+  let html = '';
+  items.tasks.forEach(t=>{
+    const showDetail = businessMode && t.detail;
+    html += `<div class="agenda-item"><span class="tag-pill" style="background:#5FA8A033;color:#5FA8A0">Task</span>${escapeHtml(t.text)}${showDetail?` — <em>${escapeHtml(t.detail)}</em>`:''}</div>`;
+  });
+  items.bills.forEach(b=>{
+    html += `<div class="agenda-item"><span class="tag-pill" style="background:#B08D5733;color:#B08D57">Bill</span>${escapeHtml(b.name)}${b.amount?` — $${escapeHtml(b.amount)}`:''}</div>`;
+  });
+  items.events.forEach(e=>{
+    const type = EVENT_TYPES[e.type]||EVENT_TYPES.other;
+    html += `<div class="agenda-item"><span class="tag-pill" style="background:${type.color}33;color:${type.color}">${type.label}</span>${escapeHtml(e.occasion)} — ${escapeHtml(e.person)}</div>`;
+  });
+  return html;
+}
+function renderAgenda(){
+  if(calView === 'week'){ document.getElementById('agendaPanel').style.display='none'; return; }
+  const panel = document.getElementById('agendaPanel');
+  panel.style.display = 'block';
+  document.getElementById('agendaTitle').textContent = selectedDate.toLocaleDateString('en-AU',{weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const items = getItemsForDate(selectedDate);
+  const html = agendaItemsHtml(items);
+  document.getElementById('agendaList').innerHTML = html || '<div class="agenda-empty">Nothing planned for this day.</div>';
+}
+
+function attachCalHandlers(){
+  document.querySelectorAll('[data-date]').forEach(el=>{
+    el.onclick = () => {
+      selectedDate = new Date(el.dataset.date + 'T00:00:00');
+      if(calView === 'year'){ calDate = new Date(selectedDate); calView='month'; setActiveViewBtn('month'); }
+      renderCalendar();
+    };
+  });
+}
+function setActiveViewBtn(view){
+  document.querySelectorAll('.view-switch button').forEach(b=> b.classList.toggle('active', b.dataset.view===view));
+}
+document.querySelectorAll('.view-switch button').forEach(btn=>{
+  btn.onclick = () => { calView = btn.dataset.view; setActiveViewBtn(calView); renderCalendar(); };
+});
+document.getElementById('calPrev').onclick = () => {
+  if(calView==='month') calDate = addMonths(calDate,-1);
+  else if(calView==='year') calDate = new Date(calDate.getFullYear()-1, calDate.getMonth(), 1);
+  else selectedDate = addDays(selectedDate,-7);
+  renderCalendar();
+};
+document.getElementById('calNext').onclick = () => {
+  if(calView==='month') calDate = addMonths(calDate,1);
+  else if(calView==='year') calDate = new Date(calDate.getFullYear()+1, calDate.getMonth(), 1);
+  else selectedDate = addDays(selectedDate,7);
+  renderCalendar();
+};
+document.getElementById('bizToggle').onclick = () => {
+  businessMode = !businessMode;
+  const btn = document.getElementById('bizToggle');
+  btn.textContent = businessMode ? 'Business view' : 'Personal view';
+  btn.classList.toggle('active', businessMode);
+  renderAll();
+};
+
+/* ---------- misc ---------- */
+function tickClock(){ document.getElementById('timeStr').textContent = new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+setInterval(tickClock,1000); tickClock();
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3500); }
+
+document.getElementById('notifyBtn').onclick = async () => {
+  if(!('Notification' in window)){ showToast('Notifications not supported in this browser.'); return; }
+  const perm = await Notification.requestPermission();
+  notifyEnabled = perm === 'granted';
+  const btn = document.getElementById('notifyBtn'); const status = document.getElementById('notifyStatus');
+  if(notifyEnabled){ btn.textContent='Reminders on'; btn.classList.add('active'); status.textContent='Watching your due times — keep this tab open to get them.'; }
+  else{ status.textContent='Permission was not granted, so on-screen reminders are off.'; }
+};
+
+function checkDueReminders(){
+  if(!notifyEnabled) return;
+  const now = new Date(); let changed=false;
+  state.tasks.forEach(t=>{
+    if(!t.due || t.done || t.notified) return;
+    if(new Date(t.due) <= now){ new Notification('Due now — '+(LANES.find(l=>l.id===t.lane)||{}).label, {body:t.text}); t.notified=true; changed=true; }
+  });
+  state.bills.forEach(b=>{
+    const due = nextOccurrence(b.anchor,b.interval,new Date());
+    const days = daysUntil(due); const key = due.toDateString();
+    if(days<=1 && b.lastNotifiedDue!==key){
+      const cat = CATEGORIES[b.category]||CATEGORIES.other;
+      new Notification((days===0?'Due today — ':'Due tomorrow — ')+b.name, {body:`${cat.label}${b.amount?' · $'+b.amount:''}`});
+      b.lastNotifiedDue = key; changed=true;
+    }
+  });
+  state.people.forEach(p=>p.events.forEach(e=>{
+    const due = nextOccurrence(e.date,e.interval,new Date());
+    const days = daysUntil(due); const key = due.toDateString();
+    if(days<=1 && e.lastNotifiedDue!==key){
+      const type = EVENT_TYPES[e.type]||EVENT_TYPES.other;
+      new Notification((days===0?'Today — ':'Tomorrow — ')+e.occasion, {body:`${type.label} · ${p.name}`});
+      e.lastNotifiedDue = key; changed=true;
+    }
+  }));
+  if(changed) save();
+}
+setInterval(checkDueReminders, 30000);
+
+
+function renderTop3(){
+  const tasks = state.tasks.filter(t=>!t.done).sort((a,b)=>{
+    const pr={high:0,medium:1,low:2};
+    const pa=pr[a.priority]??1, pb=pr[b.priority]??1;
+    if(pa!==pb) return pa-pb;
+    return (a.due?new Date(a.due):Infinity)-(b.due?new Date(b.due):Infinity);
+  }).slice(0,3);
+  document.getElementById('top3List').innerHTML = tasks.length ? tasks.map(t=>{
+    const lane=LANES.find(l=>l.id===t.lane);
+    return `<div class="top3-item">${escapeHtml(t.text)}<div class="task-meta">${lane?escapeHtml(lane.label):''}${t.due?' · '+new Date(t.due).toLocaleString('en-AU',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'}):''}</div></div>`;
+  }).join('') : '<div class="empty-today">Add your first priority using Quick Add.</div>';
+}
+
+document.getElementById('quickAddBtn').onclick=()=>{
+  const text=document.getElementById('quickText').value.trim();
+  const lane=document.getElementById('quickLane').value;
+  const due=document.getElementById('quickDue').value;
+  if(!text){showToast('Add a task, meeting or reminder first.');return;}
+  state.tasks.push({id:uid(),lane,text,detail:'',due:due?new Date(due).toISOString():null,priority:'high',done:false,notified:false});
+  document.getElementById('quickText').value='';
+  document.getElementById('quickDue').value='';
+  save();renderAll();
+};
+
+function renderAll(){ renderTop3(); renderLanesAndToday(); renderPeople(); renderCalendar(); }
+
+/* ---------- LOCK SCREEN ---------- */
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function initLock(){
+  let hash = null;
+  try{ const res = await window.storage.get('daily-deck-pw-hash'); hash = res && res.value; }
+  catch(e){ hash = null; }
+  if(!hash) renderSetupScreen();
+  else renderLoginScreen(hash);
+}
+function renderSetupScreen(){
+  document.getElementById('lockCard').innerHTML = `
+    <p class="eyebrow">Jay OS</p>
+    <h1 style="font-family:'Fraunces',serif;">Set a password</h1>
+    <p>This just locks the screen on this device — it isn't encryption, so don't reuse a password you use for banking or anything sensitive elsewhere.</p>
+    <input type="password" id="pwNew" placeholder="New password" />
+    <input type="password" id="pwConfirm" placeholder="Confirm password" />
+    <div class="lock-error" id="lockErr"></div>
+    <button class="btn btn-seaglass" id="pwSetBtn">Lock it in</button>
+  `;
+  document.getElementById('pwSetBtn').onclick = async () => {
+    const a = document.getElementById('pwNew').value;
+    const b = document.getElementById('pwConfirm').value;
+    const err = document.getElementById('lockErr');
+    if(!a || a.length < 4){ err.textContent = 'Use at least 4 characters.'; return; }
+    if(a !== b){ err.textContent = "Passwords don't match."; return; }
+    const hash = await sha256(a);
+    try{ await window.storage.set('daily-deck-pw-hash', hash); }catch(e){ err.textContent='Could not save password — try again.'; return; }
+    unlockApp();
+  };
+}
+function renderLoginScreen(hash){
+  document.getElementById('lockCard').innerHTML = `
+    <p class="eyebrow">Jay OS</p>
+    <h1 style="font-family:'Fraunces',serif;">Enter password</h1>
+    <p>Only unlocks the screen — your data was already saved either way.</p>
+    <input type="password" id="pwEntry" placeholder="Password" />
+    <div class="lock-error" id="lockErr"></div>
+    <button class="btn btn-seaglass" id="pwGoBtn">Unlock</button>
+    <button class="lock-reset" id="pwResetBtn">Forgot it — reset password</button>
+  `;
+  const tryUnlock = async () => {
+    const val = document.getElementById('pwEntry').value;
+    const err = document.getElementById('lockErr');
+    const enteredHash = await sha256(val);
+    if(enteredHash === hash){ unlockApp(); }
+    else{ err.textContent = 'Wrong password. Try again.'; }
+  };
+  document.getElementById('pwGoBtn').onclick = tryUnlock;
+  document.getElementById('pwEntry').addEventListener('keydown', e=>{ if(e.key==='Enter') tryUnlock(); });
+  document.getElementById('pwResetBtn').onclick = async () => {
+    if(!confirm('This removes the current password so you can set a new one. Your tasks, bills, and other data stay untouched. Continue?')) return;
+    try{ await window.storage.delete('daily-deck-pw-hash'); }catch(e){}
+    renderSetupScreen();
+  };
+}
+function unlockApp(){
+  document.getElementById('lockScreen').style.display = 'none';
+  document.getElementById('mainWrap').classList.add('unlocked');
+  load();
+}
+
+initLock();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+  });
+}
+</script>
+</body>
+</html>
