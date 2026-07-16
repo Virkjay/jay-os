@@ -1,21 +1,21 @@
-JAY OS PWA
+JAY OS v0.1
 
-Important: iPhone cannot install a PWA directly from a ZIP or local HTML file. The folder must be placed on a secure HTTPS website first.
+This is the first working app-style version.
 
-Free setup using GitHub Pages:
-1. Create a free GitHub account.
-2. Create a new public repository named jay-os.
-3. Upload all files from this folder, keeping the icons folder.
-4. Open repository Settings, then Pages.
-5. Under Build and deployment, select Deploy from a branch.
-6. Select the main branch and root folder, then Save.
-7. GitHub will provide a secure web address.
+UPLOAD TO GITHUB
+1. Open your jay-os repository.
+2. Click Add file, then Upload files.
+3. Upload everything INSIDE this folder.
+4. GitHub will replace files with matching names.
+5. Click Commit changes.
+6. Wait 1 to 3 minutes for GitHub Pages to redeploy.
 
-Install on iPhone:
-1. Open that web address in Safari.
-2. Tap the Share icon.
-3. Tap Add to Home Screen.
-4. Tap Add.
-5. Open Jay OS from the new Home Screen icon.
+IPHONE
+1. Open https://virkjay.github.io/jay-os/ in Safari.
+2. Refresh the page.
+3. Tap Share.
+4. Tap Add to Home Screen.
+5. Delete the old Home Screen icon first if it still shows the older design.
 
-Data is stored locally in Safari on that iPhone. Removing website data or deleting the app may remove stored information. Cloud sync and backup are not included in this version.
+DATA
+Your information is stored on the device. Use the Backup option inside Jay OS regularly.
