@@ -1,24 +1,15 @@
-JAY OS VERSION 0.2
+JAY OS VERSION 0.2.1
 
-Included:
-- Swipe between pages
-- Smooth page and sheet animations
-- Floating Quick Add
-- Apple-style month calendar
-- Top 3 priorities with drag and drop
-- Premium glass cards
-- Universal search
-- Improved dark and light themes
-- Today progress and Next Up widgets
+CHANGES
+1. Every main page and swipe now opens at the top.
+2. Bills support one-off, weekly, fortnightly, monthly, quarterly and yearly schedules.
+3. Bills display amount and payment frequency.
+4. Marking a recurring bill paid records the payment and advances the next due date.
+5. Added Friends and Gift Ledger with given, received and net totals.
+6. Search includes gifts and recurring bill frequency.
+7. Existing Version 0.2 tasks, notes and appointments remain stored on the device.
 
-UPLOAD
-1. Unzip this file.
-2. Open your GitHub jay-os repository.
-3. Click Add file > Upload files.
-4. Upload the CONTENTS of JayOS-v0.2.
-5. Commit changes.
-6. Wait 1 to 3 minutes.
-7. Refresh https://virkjay.github.io/jay-os/
-
-IPHONE
-Delete the old Home Screen icon, open the site in Safari, then Share > Add to Home Screen.
+UPDATE GITHUB
+Upload everything inside this folder to the root of your jay-os repository.
+Commit the changes and wait 1 to 3 minutes.
+On iPhone, close Jay OS completely and reopen it. If the old version remains, remove the Home Screen icon, open the site in Safari, refresh, and add it again.

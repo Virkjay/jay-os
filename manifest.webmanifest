@@ -1,11 +1,11 @@
 {
-  "name": "Jay OS",
+  "name": "Jay OS 0.2.1",
   "short_name": "Jay OS",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07111f",
   "theme_color": "#07111f",
-  "description": "Jay's personal daily organiser",
+  "description": "Personal organiser with tasks, calendar, recurring bills and gift ledger",
   "icons": [
     {
       "src": "icons/icon-192.png",
