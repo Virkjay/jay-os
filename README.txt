@@ -1,19 +1,12 @@
-JAY OS VERSION 0.4
+JAY OS VERSION 0.4.1
 
-NEW IN THIS BUILD
-- Focus Mode: All, Work, Personal, Family, Health and Travel.
-- Health page with editable weekly gym schedule and completion tracking.
-- People profiles with birthdays, anniversaries, phone and notes.
-- Document expiry tracker.
-- Travel planner.
-- Dedicated Ideas section.
-- Daily Journal.
-- Today widgets for gym and life reminders.
-- Simple natural-language Quick Add.
-- Existing v0.2 and v0.3 data remains on the same device.
+FIXED
+- Add and edit forms now have a visible Close button.
+- Added a Cancel button at the bottom.
+- Tapping outside the form still closes it.
+- Swiping the form down closes it on iPhone.
+- Escape closes it on desktop.
+- You no longer need to complete the form to return to the app.
 
-OUTLOOK CALENDAR
-Not connected yet. Microsoft sign-in and Graph permissions require a separate registered Microsoft application.
-
-UPLOAD
-Upload all files inside this folder to the root of the GitHub jay-os repository and commit.
+UPDATE
+Upload all files to the root of your GitHub jay-os repository and commit the changes.
