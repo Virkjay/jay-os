@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Jay OS">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
-<title>Jay OS 0.4.1</title>
+<title>Jay OS 0.4.2</title>
 <style>
 :root{--bg:#07111f;--bg2:#0b1728;--surface:#122036;--surface2:#172741;--line:rgba(255,255,255,.09);--text:#f7f9fc;--muted:#99a8bc;--accent:#e5ad45;--green:#62d1aa;--blue:#78aeff;--red:#ff8178;--violet:#b29aff;--shadow:0 20px 55px rgba(0,0,0,.24)}
 body.light{--bg:#edf2f8;--bg2:#f7f9fc;--surface:#fff;--surface2:#f4f6fa;--line:rgba(15,23,42,.09);--text:#122033;--muted:#68758a;--shadow:0 16px 44px rgba(33,49,74,.12)}
@@ -21,7 +21,7 @@ body.light{--bg:#edf2f8;--bg2:#f7f9fc;--surface:#fff;--surface2:#f4f6fa;--line:r
 <body>
 <div class="app">
 <header class="topbar">
-<div class="avatar">J</div><div class="hello"><small id="todayDate"></small><strong id="greeting"></strong></div>
+<div class="avatar">J</div><span id="versionBadge" style="position:fixed;top:calc(env(safe-area-inset-top) + 4px);right:8px;z-index:100;font-size:9px;color:var(--muted);opacity:.75">v0.4.2</span><div class="hello"><small id="todayDate"></small><strong id="greeting"></strong></div>
 <div class="topActions"><select id="focusMode" class="focusSelect"><option value="all">All</option><option value="work">Work</option><option value="personal">Personal</option><option value="family">Family</option><option value="health">Health</option><option value="travel">Travel</option></select><button class="iconBtn" id="searchBtn">⌕</button><button class="iconBtn" id="themeBtn">◐</button></div>
 </header>
 
@@ -225,6 +225,20 @@ $('#searchInput').oninput=e=>{const q=e.target.value.trim().toLowerCase(),items=
 
 function render(){applyTheme();renderHome();renderCalendar();renderTasks();renderNotes();renderMore()}
 const hr=new Date().getHours();$('#greeting').textContent=hr<12?'Good morning, Jay':hr<17?'Good afternoon, Jay':'Good evening, Jay';$('#todayDate').textContent=new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long'});
-render();if('serviceWorker'in navigator)navigator.serviceWorker.register('./service-worker.js?v=04');
+render();
+if('serviceWorker' in navigator){
+  window.addEventListener('load', async ()=>{
+    try{
+      const reg = await navigator.serviceWorker.register('./service-worker.js?v=042', {updateViaCache:'none'});
+      await reg.update();
+      navigator.serviceWorker.addEventListener('controllerchange', ()=>{
+        if(!sessionStorage.getItem('jayos-sw-reloaded')){
+          sessionStorage.setItem('jayos-sw-reloaded','1');
+          location.reload();
+        }
+      });
+    }catch(e){ console.error('Service worker update failed', e); }
+  });
+}
 </script>
 </body></html>
