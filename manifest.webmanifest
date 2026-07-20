@@ -1,11 +1,11 @@
 {
-  "name": "Jay OS 0.4.2",
+  "name": "Jay OS 1.0",
   "short_name": "Jay OS",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#07111f",
   "theme_color": "#07111f",
-  "description": "Jay OS with corrected form closing controls and cache refresh.",
+  "description": "A personal operating system for daily life, business, family, health and reminders.",
   "icons": [
     {
       "src": "./icons/icon-192.png",

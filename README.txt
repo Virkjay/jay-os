@@ -1,23 +1,44 @@
-JAY OS VERSION 0.4.2
+JAY OS 1.0
 
-VERIFIED FIXES
-- Visible X close button in the add/edit form.
-- Cancel button at the bottom of the form.
-- Tap outside the form to close.
-- Swipe down to close on iPhone.
-- Escape key closes the form on desktop.
-- A visible v0.4.2 label appears at the top-right of the app.
+INCLUDED
+- Today dashboard with Focus Mode
+- Top 3 priorities
+- Daily timeline
+- Calendar
+- Tasks
+- People profiles
+- Gift ledger
+- Bills and recurring payments
+- Health and gym schedule
+- Business overview
+- Documents
+- Travel
+- Ideas
+- Journal
+- Activity timeline
+- Search
+- Dark and light mode
+- Backup export and import
+- Offline PWA support
+- Close and Cancel controls
+- Existing local storage compatibility
 
-CACHE FIX
-- Updated service worker version to v042.
-- Navigation now checks the internet first so GitHub updates appear faster.
-- The app requests a fresh service worker after deployment.
+NOT INCLUDED
+- Outlook Calendar sync
+- Cloud sync
+- AI assistant
+- File uploads
+- Push notifications while the app is fully closed
 
-UPLOAD
-1. Upload every file INSIDE this folder to the ROOT of the GitHub repository.
-2. Do not upload the JayOS-v0.4.2 folder itself.
-3. Commit the changes.
-4. Wait 2 to 3 minutes.
-5. Open the GitHub Pages URL in Safari and refresh.
-6. Confirm that v0.4.2 appears at the top-right.
-7. If the old version remains, remove the Home Screen icon, clear Safari website data for virkjay.github.io, reopen the website, and add it to the Home Screen again.
+UPDATE GITHUB
+1. Unzip JayOS-v1.0.zip.
+2. Open the JayOS-v1.0 folder.
+3. Upload every file inside it to the root of your jay-os GitHub repository.
+4. Commit changes.
+5. Wait 2 to 3 minutes.
+6. Open the GitHub Pages address in Safari.
+7. Confirm that v1.0 appears at the top-right.
+8. If an older version remains, remove the Home Screen icon, clear Safari website data for virkjay.github.io, reopen the site, and add it again.
+
+BACKUP
+Before future major updates, use More > Data > Export.
